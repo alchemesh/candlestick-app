@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: candlestick-rabbitmq-service
+  labels:
+    name: candlestick-rabbitmq-service
+    app: candlestick-rabbitmq-app
+  namespace: _{_NAMESPACE_}_
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 15672
+      targetPort: 15672
+      nodePort: 30006
+      protocol: TCP
+      name: management
+    - port: 5672
+      targetPort: 5672
+      nodePort: 30007
+      protocol: TCP
+      name: amqp
+  selector:
+    name: candlestick-rabbitmq-app-pod
+    app: candlestick-rabbitmq-app

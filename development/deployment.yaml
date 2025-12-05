@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: candlestick-rabbitmq-app-deploy
+  labels:
+    name: candlestick-rabbitmq-app-deploy
+    app: candlestick-rabbitmq-app
+  namespace: _{_NAMESPACE_}_
+spec:
+  replicas: _{_REPLICAS_}_
+  selector:
+    matchLabels:
+      name: candlestick-rabbitmq-app-pod
+      app: candlestick-rabbitmq-app
+
+  template:
+    metadata:
+      name: candlestick-rabbitmq-app-pod
+      labels:
+        name: candlestick-rabbitmq-app-pod
+        app: candlestick-rabbitmq-app
+    spec:
+      containers:
+        - name: candlestick-rabbitmq-app
+          imagePullPolicy: Always
+          image: _{_IMAGE_}_
+          ports:
+            - containerPort: 5672
+              name: amqp
+            - containerPort: 15672
+              name: management
+            

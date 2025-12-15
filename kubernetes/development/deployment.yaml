@@ -1,0 +1,316 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    instance: candlestick-app
+    name: candlestick-app
+  name: candlestick-app
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: candlestick-ingress
+  labels:
+    name: candlestick-ingress
+  namespace: candlestick-app
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: candlestick-app-candlestick-app.myapp.ito
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: candlestick-frontend-service
+            port:
+              number: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: candlestick-mysql-service
+  labels:
+    name: candlestick-mysql-service
+    app: candlestick-mysql-app
+  namespace: candlestick-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 3306
+      targetPort: 3306
+      nodePort: 30008
+      protocol: TCP
+  selector:
+    name: candlestick-mysql-app-pod
+    app: candlestick-mysql-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: candlestick-mysql-app-deploy
+  labels:
+    name: candlestick-mysql-app-deploy
+    app: candlestick-mysql-app
+  namespace: candlestick-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: candlestick-mysql-app-pod
+      app: candlestick-mysql-app
+
+  template:
+    metadata:
+      name: candlestick-mysql-app-pod
+      labels:
+        name: candlestick-mysql-app-pod
+        app: candlestick-mysql-app
+    spec:
+      containers:
+        - name: candlestick-mysql-app
+          imagePullPolicy: Always
+          image: sabatiel180/candlestick-mysql-db-app:latest
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "750m"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: mypassword
+          ports:
+            - containerPort: 3306
+              name: mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: candlestick-rabbitmq-service
+  labels:
+    name: candlestick-rabbitmq-service
+    app: candlestick-rabbitmq-app
+  namespace: candlestick-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 15672
+      targetPort: 15672
+      nodePort: 30006
+      protocol: TCP
+      name: management
+    - port: 5672
+      targetPort: 5672
+      nodePort: 30007
+      protocol: TCP
+      name: amqp
+  selector:
+    name: candlestick-rabbitmq-app-pod
+    app: candlestick-rabbitmq-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: candlestick-rabbitmq-app-deploy
+  labels:
+    name: candlestick-rabbitmq-app-deploy
+    app: candlestick-rabbitmq-app
+  namespace: candlestick-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: candlestick-rabbitmq-app-pod
+      app: candlestick-rabbitmq-app
+
+  template:
+    metadata:
+      name: candlestick-rabbitmq-app-pod
+      labels:
+        name: candlestick-rabbitmq-app-pod
+        app: candlestick-rabbitmq-app
+    spec:
+      containers:
+        - name: candlestick-rabbitmq-app
+          imagePullPolicy: Always
+          image: rabbitmq:3-management
+          ports:
+            - containerPort: 5672
+              name: amqp
+            - containerPort: 15672
+              name: management
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: candlestick-java-api-service
+  labels:
+    name: candlestick-java-api-service
+    app: candlestick-java-api-app
+  namespace: candlestick-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30010
+      protocol: TCP
+  selector:
+    name: candlestick-java-api-app-pod
+    app: candlestick-java-api-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: candlestick-java-api-app-deploy
+  labels:
+    name: candlestick-java-api-app-deploy
+    app: candlestick-java-api-app
+  namespace: candlestick-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: candlestick-java-api-app-pod
+      app: candlestick-java-api-app
+
+  template:
+    metadata:
+      name: candlestick-java-api-app-pod
+      labels:
+        name: candlestick-java-api-app-pod
+        app: candlestick-java-api-app
+    spec:
+      containers:
+        - name: candlestick-java-api-app
+          imagePullPolicy: Always
+          image: sabatiel180/candlestick-java-api-app:latest
+          env:
+            - name: MYSQL_DB
+              value: candlestick-mysql-service
+            - name: MYSQL_USER
+              value: root
+            - name: MYSQL_PASS
+              value: mypassword
+          ports:
+            - containerPort: 8080
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: candlestick-backend-service
+  labels:
+    name: candlestick-backend-service
+    app: candlestick-backend-app
+  namespace: candlestick-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3000
+      nodePort: 30011
+      protocol: TCP
+  selector:
+    name: candlestick-backend-app-pod
+    app: candlestick-backend-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: candlestick-backend-app-deploy
+  labels:
+    name: candlestick-backend-app-deploy
+    app: candlestick-backend-app
+  namespace: candlestick-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: candlestick-backend-app-pod
+      app: candlestick-backend-app
+
+  template:
+    metadata:
+      name: candlestick-backend-app-pod
+      labels:
+        name: candlestick-backend-app-pod
+        app: candlestick-backend-app
+    spec:
+      containers:
+        - name: candlestick-backend-app
+          imagePullPolicy: Always
+          image: sabatiel180/candlestick-backend-app:latest
+          env:
+            - name: RABBITMQ
+              value: candlestick-rabbitmq-service
+            - name: JAVA_API
+              value: candlestick-java-api-service
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: candlestick-frontend-service
+  labels:
+    name: candlestick-frontend-service
+    app: candlestick-frontend-app
+  namespace: candlestick-app
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 3000
+      nodePort: 30005
+      protocol: TCP
+  selector:
+    name: candlestick-frontend-app-pod
+    app: candlestick-frontend-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: candlestick-frontend-app-deploy
+  labels:
+    name: candlestick-frontend-app-deploy
+    app: candlestick-frontend-app
+  namespace: candlestick-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: candlestick-frontend-app-pod
+      app: candlestick-frontend-app
+
+  template:
+    metadata:
+      name: candlestick-frontend-app-pod
+      labels:
+        name: candlestick-frontend-app-pod
+        app: candlestick-frontend-app
+    spec:
+      containers:
+        - name: candlestick-frontend-app
+          imagePullPolicy: Always
+          image: sabatiel180/candlestick-frontend-app:latest
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: RABBITMQ
+              value: candlestick-rabbitmq-service
+            - name: JAVA_API
+              value: candlestick-java-api-service
+          ports:
+            - containerPort: 3000
+              name: http
+            

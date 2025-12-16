@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: candlestick-ingress
+  labels:
+    name: candlestick-ingress
+  namespace: candlestick-app
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: candlestick-app-candlestick-app.myapp.ito
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: candlestick-frontend-service
+            port:
+              number: 80

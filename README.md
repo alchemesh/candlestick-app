@@ -11,7 +11,7 @@ Key featues about the app include:
 * Proccessing to results takes only a second
 * Flexibility for scaling
 
-This application was designed with an event-driven methodology in mind. There are 5 tiers to this application, with each tier having its own role to play as microservices for the application's bottomline. While it is not necessary to install each repository, I invite you to visit each tier for a better understanding of how each one functions.
+This Candlestick App was designed with an event-driven methodology in mind. There are 5 tiers, with each tier having its own role to play as microservices for the application's bottomline. While it is not necessary to install each repository, I invite you to visit each tier for a better understanding of how each one works.
 
 The 5 tiers are:
 1) FrontEnd (NodeJS):  Github Repository - [NodeJS Frontend](https://github.com/alchemesh/candlestick-frontend)
@@ -23,6 +23,7 @@ The 5 tiers are:
 
 ***NOTE: The RabbitMQ broker service does not need a repository and can be deployed using the RabbitMQ Docker image***
 
+Each repository is responsible for its own CI/CD pipeline, leveraging Github Actions to accomplish this. With the exclusion of MYSQL, unit testing, coverage testing, building, deployment, and integration testing are done from the pipeline to ensure build changes are precise, and do not provide any unwanted behaviors. 
 
 ## How it works ##
 

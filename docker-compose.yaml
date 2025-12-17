@@ -27,6 +27,6 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: mypassword
   candlestick-mysql:
-    image: sabatiel180/candlestick-mysql-app
+    image: sabatiel180/candlestick-mysql-db-app
     environment:
       MYSQL_PASSWORD: mypassword

@@ -11,6 +11,12 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 6<> /dev/tcp/localhost/5672'"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
   candlestick-backend:
     image: sabatiel180/candlestick-backend-app # Get backend application image
     environment:

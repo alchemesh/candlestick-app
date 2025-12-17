@@ -13,20 +13,24 @@ services:
       - "15672:15672"
   candlestick-backend:
     image: sabatiel180/candlestick-backend-app # Get backend application image
-    ports:
-      - "80" # Map host port 80
     environment:
       RABBITMQ: candlestick-rabbitmq
       JAVA_API: candlestick-java-api
+    depends_on:
+      - candlestick-rabbitmq
   candlestick-java-api:
     image: sabatiel180/candlestick-java-api-app # Get Java API application image
     ports:
-      - "80:8080" # Map host port 80 to container port 8080
+      - "8080:8080" # Map host port 80 to container port 8080
     environment:
       MYSQL_DB: candlestick-mysql
       MYSQL_USER: root
       MYSQL_PASS: mypassword
+    depends_on:
+      - candlestick-mysql
   candlestick-mysql:
     image: sabatiel180/candlestick-mysql-db-app
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: mypassword

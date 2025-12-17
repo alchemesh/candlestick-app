@@ -35,10 +35,10 @@ Afterwards, the NodeJS application transitions, and calls the Java API for data 
 
 Deploy the image using the Kubernetes deployment file that can be found in kubernetes/development. This file has all parts, including ingress, services, and deployments. The application stack can also be deployed using the Helm charts found in this repository. 
 
-##### Using Kubernetes #####
+#### Using Kubernetes ####
 kubectl apply -f kubernetes/deployment
 
 or
 
-##### Using Helm #####
+#### Using Helm ####
 helm install candlestick-app ./candlestick-app

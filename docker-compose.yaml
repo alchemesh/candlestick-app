@@ -23,7 +23,8 @@ services:
       RABBITMQ: candlestick-rabbitmq
       JAVA_API: candlestick-java-api
     depends_on:
-      - candlestick-rabbitmq
+      candlestick-rabbitmq:
+        condition: service_healthy
   candlestick-java-api:
     image: sabatiel180/candlestick-java-api-app # Get Java API application image
     ports:

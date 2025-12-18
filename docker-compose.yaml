@@ -20,7 +20,7 @@ services:
   candlestick-backend:
     image: sabatiel180/candlestick-backend-app # Get backend application image
     ports:
-      - "8080:8080" # Map host port 8080
+      - "8080" # Map host port 8080
     environment:
       RABBITMQ: candlestick-rabbitmq
       JAVA_API: candlestick-java-api
